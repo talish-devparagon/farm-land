@@ -30,7 +30,9 @@
 
 @layer theme {
     .dark {
+        --color-accent: #00d3f2;
         --color-accent-content: #f1f5f9;
+        --color-accent-foreground: #0f172a;
 
         --color-zinc-50: #f8fafc;
         --color-zinc-100: #f1f5f9;
