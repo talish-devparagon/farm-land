@@ -23,16 +23,14 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
+    --color-accent: #00d3f2;
+    --color-accent-content: #0f172a;
+    --color-accent-foreground: #0f172a;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent-content: #f1f5f9;
 
         --color-zinc-50: #f8fafc;
         --color-zinc-100: #f1f5f9;
@@ -82,7 +80,7 @@
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-white dark:ring-offset-zinc-900;
 }
 
 /* \[:where(&)\]:size-4 {
