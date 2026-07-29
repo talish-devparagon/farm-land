@@ -1,24 +1,43 @@
 <div>
-    <div x-show="@js($show)">
-        <form wire:submit="save">
-            <select wire:model="type">
-                <option value="">{{ __('Select type') }}</option>
+    <flux:modal wire:model.self="show" class="md:w-full md:max-w-lg">
+        <form wire:submit="save" class="space-y-6">
+            <div>
+                <flux:heading size="lg">
+                    {{ $healthRecordId ? __('Edit health record') : __('Add health record') }}
+                </flux:heading>
+            </div>
+
+            <flux:select wire:model="type" :label="__('Type')" placeholder="{{ __('Select type') }}">
                 @foreach (\App\Enums\HealthRecordType::cases() as $case)
-                    <option value="{{ $case->value }}">{{ $case->value }}</option>
+                    <flux:select.option value="{{ $case->value }}">{{ ucfirst(str_replace('_', ' ', $case->value)) }}</flux:select.option>
                 @endforeach
-            </select>
+            </flux:select>
 
-            <textarea wire:model="description" placeholder="{{ __('Description') }}"></textarea>
+            <flux:textarea wire:model="description" :label="__('Description')" />
 
-            <input type="date" wire:model="date">
-            <input type="date" wire:model="next_due_date">
-            <textarea wire:model="notes" placeholder="{{ __('Notes') }}"></textarea>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <flux:input wire:model="date" type="date" :label="__('Date')" />
+                <flux:input wire:model="next_due_date" type="date" :label="__('Next due date')" />
+            </div>
 
-            <button type="submit">{{ __('Save') }}</button>
+            <flux:textarea wire:model="notes" :label="__('Notes')" />
 
-            @if ($healthRecordId)
-                <button type="button" wire:click="delete" wire:confirm="{{ __('Are you sure?') }}">{{ __('Delete') }}</button>
-            @endif
+            <div class="flex items-center justify-between gap-2">
+                <div>
+                    @if ($healthRecordId)
+                        <flux:button variant="danger" wire:click="delete" wire:confirm="{{ __('Are you sure?') }}">
+                            {{ __('Delete') }}
+                        </flux:button>
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <flux:modal.close>
+                        <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
+                    </flux:modal.close>
+                    <flux:button type="submit" variant="primary">{{ __('Save') }}</flux:button>
+                </div>
+            </div>
         </form>
-    </div>
+    </flux:modal>
 </div>

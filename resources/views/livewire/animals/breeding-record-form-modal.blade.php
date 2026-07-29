@@ -1,48 +1,75 @@
 <div>
-    <div x-show="@js($show)">
-        <form wire:submit="save">
-            <select wire:model="buck_id">
-                <option value="">{{ __('None') }}</option>
-                @foreach (\App\Models\Animal::query()->where('sex', \App\Enums\AnimalSex::Male->value)->get() as $buck)
-                    <option value="{{ $buck->id }}">{{ $buck->tag_number }}</option>
-                @endforeach
-            </select>
+    <flux:modal wire:model.self="show" class="md:w-full md:max-w-lg">
+        <form wire:submit="save" class="space-y-6">
+            <div>
+                <flux:heading size="lg">
+                    {{ $breedingRecordId ? __('Edit breeding record') : __('Add breeding record') }}
+                </flux:heading>
+            </div>
 
-            <input type="date" wire:model="mating_date">
-            <input type="date" wire:model="expected_kidding_date">
-            <input type="date" wire:model="actual_kidding_date">
-            <textarea wire:model="notes" placeholder="{{ __('Notes') }}"></textarea>
+            <flux:select wire:model="buck_id" :label="__('Buck')" placeholder="{{ __('None') }}">
+                @foreach (\App\Models\Animal::query()->where('sex', \App\Enums\AnimalSex::Male->value)->orderBy('tag_number')->get() as $buck)
+                    <flux:select.option value="{{ $buck->id }}">{{ $buck->tag_number }}</flux:select.option>
+                @endforeach
+            </flux:select>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <flux:input wire:model="mating_date" type="date" :label="__('Mating date')" />
+                <flux:input wire:model="expected_kidding_date" type="date" :label="__('Expected kidding date')" />
+            </div>
+
+            <flux:input wire:model.live="actual_kidding_date" type="date" :label="__('Actual kidding date')" />
+
+            <flux:textarea wire:model="notes" :label="__('Notes')" />
 
             @if ($actual_kidding_date)
-                <label>
-                    <input type="checkbox" wire:model.live="create_offspring">
-                    {{ __('Record offspring') }}
-                </label>
+                <flux:checkbox wire:model.live="create_offspring" :label="__('Record offspring')" />
 
                 @if ($create_offspring)
-                    @foreach ($offspring as $index => $child)
-                        <div wire:key="offspring-{{ $index }}">
-                            <input type="text" wire:model="offspring.{{ $index }}.tag_number" placeholder="{{ __('Tag number') }}">
-                            <input type="text" wire:model="offspring.{{ $index }}.name" placeholder="{{ __('Name') }}">
-                            <select wire:model="offspring.{{ $index }}.sex">
-                                <option value="">{{ __('Select sex') }}</option>
-                                @foreach (\App\Enums\AnimalSex::cases() as $case)
-                                    <option value="{{ $case->value }}">{{ $case->value }}</option>
-                                @endforeach
-                            </select>
-                            <button type="button" wire:click="removeOffspring({{ $index }})">{{ __('Remove') }}</button>
-                        </div>
-                    @endforeach
+                    <div class="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                        @foreach ($offspring as $index => $child)
+                            <div wire:key="offspring-{{ $index }}" class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
+                                <flux:input wire:model="offspring.{{ $index }}.tag_number" :label="__('Tag number')" />
+                                <flux:input wire:model="offspring.{{ $index }}.name" :label="__('Name')" />
+                                <flux:select wire:model="offspring.{{ $index }}.sex" :label="__('Sex')" placeholder="{{ __('Select sex') }}">
+                                    @foreach (\App\Enums\AnimalSex::cases() as $case)
+                                        <flux:select.option value="{{ $case->value }}">{{ ucfirst($case->value) }}</flux:select.option>
+                                    @endforeach
+                                </flux:select>
+                                <flux:button
+                                    type="button"
+                                    variant="danger"
+                                    icon="x-mark"
+                                    square
+                                    aria-label="{{ __('Remove') }}"
+                                    wire:click="removeOffspring({{ $index }})"
+                                />
+                            </div>
+                        @endforeach
 
-                    <button type="button" wire:click="addOffspring">{{ __('Add offspring') }}</button>
+                        <flux:button type="button" variant="filled" icon="plus" wire:click="addOffspring">
+                            {{ __('Add offspring') }}
+                        </flux:button>
+                    </div>
                 @endif
             @endif
 
-            <button type="submit">{{ __('Save') }}</button>
+            <div class="flex items-center justify-between gap-2">
+                <div>
+                    @if ($breedingRecordId)
+                        <flux:button variant="danger" wire:click="delete" wire:confirm="{{ __('Are you sure?') }}">
+                            {{ __('Delete') }}
+                        </flux:button>
+                    @endif
+                </div>
 
-            @if ($breedingRecordId)
-                <button type="button" wire:click="delete" wire:confirm="{{ __('Are you sure?') }}">{{ __('Delete') }}</button>
-            @endif
+                <div class="flex items-center gap-2">
+                    <flux:modal.close>
+                        <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
+                    </flux:modal.close>
+                    <flux:button type="submit" variant="primary">{{ __('Save') }}</flux:button>
+                </div>
+            </div>
         </form>
-    </div>
+    </flux:modal>
 </div>

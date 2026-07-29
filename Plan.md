@@ -9,7 +9,7 @@ This document splits the farmland feature build into 4 independent phases (A–D
 - [x] **Phase A — Data Layer** — completed
 - [x] Phase B — Livewire Components, Routes & Validation
 - [x] Phase C — Authorization, Actions & Registration
-- [ ] Phase D — Frontend / UI (Flux)
+- [x] Phase D — Frontend / UI (Flux)
 - [ ] Verification Phase
 
 ---

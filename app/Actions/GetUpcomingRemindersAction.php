@@ -15,24 +15,40 @@ class GetUpcomingRemindersAction
      */
     public function handle(): array
     {
-        $healthRecords = HealthRecord::query()
+        return [
+            'healthRecords' => $this->healthRecords(),
+            'breedingRecords' => $this->breedingRecords(),
+        ];
+    }
+
+    /**
+     * Get health records due within the next 30 days.
+     *
+     * @return Collection<int, HealthRecord>
+     */
+    public function healthRecords(): Collection
+    {
+        return HealthRecord::query()
             ->with('animal')
             ->whereHas('animal')
             ->whereBetween('next_due_date', [now()->toDateString(), now()->addDays(30)->toDateString()])
             ->orderBy('next_due_date')
             ->get();
+    }
 
-        $breedingRecords = BreedingRecord::query()
+    /**
+     * Get breeding records due within the next 30 days.
+     *
+     * @return Collection<int, BreedingRecord>
+     */
+    public function breedingRecords(): Collection
+    {
+        return BreedingRecord::query()
             ->with('doe')
             ->whereHas('doe')
             ->whereNull('actual_kidding_date')
             ->whereBetween('expected_kidding_date', [now()->toDateString(), now()->addDays(30)->toDateString()])
             ->orderBy('expected_kidding_date')
             ->get();
-
-        return [
-            'healthRecords' => $healthRecords,
-            'breedingRecords' => $breedingRecords,
-        ];
     }
 }

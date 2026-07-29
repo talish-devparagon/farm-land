@@ -15,6 +15,14 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="rectangle-stack" :href="route('animals.index')" :current="request()->routeIs('animals.*')" wire:navigate>
+                        {{ __('Animals') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="bell-alert" :href="route('upcoming.index')" :current="request()->routeIs('upcoming.*')" wire:navigate>
+                        {{ __('Upcoming') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

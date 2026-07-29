@@ -30,11 +30,16 @@ class HealthRecordFactory extends Factory
 
     /**
      * Indicate that this record has a next due date within the next 30 days.
+     *
+     * Uses a 1-29 day offset (rather than the full 0-30 range) so the stored
+     * date keeps a buffer on both ends of the "next 30 days" query window,
+     * even if a small amount of time elapses between the factory generating
+     * this date and a test's own `now()`-based assertion.
      */
     public function dueSoon(): static
     {
         return $this->state(fn (array $attributes) => [
-            'next_due_date' => fake()->dateTimeBetween('now', '+30 days'),
+            'next_due_date' => now()->addDays(fake()->numberBetween(1, 29))->toDateString(),
         ]);
     }
 }
