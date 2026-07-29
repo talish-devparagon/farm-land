@@ -130,7 +130,7 @@
 
                             <div class="flex items-center space-x-3">
                                 <flux:button
-                                    variant="outline"
+                                    variant="filled"
                                     class="flex-1"
                                     wire:click="resetVerification"
                                 >

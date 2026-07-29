@@ -11,7 +11,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <flux:button href="{{ route('animals.edit', $animal) }}" wire:navigate>
+            <flux:button variant="filled" href="{{ route('animals.edit', $animal) }}" wire:navigate>
                 {{ __('Edit') }}
             </flux:button>
 
@@ -115,7 +115,7 @@
             <flux:card class="space-y-3">
                 <div class="flex items-center justify-between">
                     <flux:heading size="lg">{{ __('Health records') }}</flux:heading>
-                    <flux:button size="sm" icon="plus" wire:click="openHealthRecordModal">
+                    <flux:button size="sm" variant="filled" icon="plus" wire:click="openHealthRecordModal">
                         {{ __('Add health record') }}
                     </flux:button>
                 </div>
@@ -147,7 +147,7 @@
             <flux:card class="space-y-3">
                 <div class="flex items-center justify-between">
                     <flux:heading size="lg">{{ __('Breeding records') }}</flux:heading>
-                    <flux:button size="sm" icon="plus" wire:click="openBreedingRecordModal">
+                    <flux:button size="sm" variant="filled" icon="plus" wire:click="openBreedingRecordModal">
                         {{ __('Add breeding record') }}
                     </flux:button>
                 </div>
