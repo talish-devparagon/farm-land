@@ -6,7 +6,7 @@
         </div>
 
         <div class="flex flex-wrap items-end gap-2">
-            <flux:select x-model="newRecordAnimalId" placeholder="{{ __('Choose an animal') }}" class="max-w-2xs">
+            <flux:select x-model="newRecordAnimalId" placeholder="{{ __('Choose an animal') }}" class="max-w-44">
                 @foreach ($this->animalOptions as $animal)
                     <flux:select.option value="{{ $animal->id }}">
                         {{ $animal->tag_number }}{{ $animal->name ? ' · '.$animal->name : '' }}

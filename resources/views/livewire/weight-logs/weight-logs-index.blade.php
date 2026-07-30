@@ -4,7 +4,7 @@
         <flux:text class="mt-1">{{ __('Track growth across the whole herd.') }}</flux:text>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap items-end gap-3">
         <flux:input
             wire:model.live="search"
             icon="magnifying-glass"
