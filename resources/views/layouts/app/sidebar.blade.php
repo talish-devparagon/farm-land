@@ -10,18 +10,16 @@
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
 
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
+            <flux:sidebar.nav class="gap-4">
+                <flux:sidebar.group :heading="__('Overview')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+                </flux:sidebar.group>
 
+                <flux:sidebar.group :heading="__('Livestock')" class="grid">
                     <flux:sidebar.item icon="rectangle-stack" :href="route('animals.index')" :current="request()->routeIs('animals.*')" wire:navigate>
                         {{ __('Animals') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="bell-alert" :href="route('upcoming.index')" :current="request()->routeIs('upcoming.*')" wire:navigate>
-                        {{ __('Upcoming') }}
                     </flux:sidebar.item>
 
                     <flux:sidebar.item icon="shield-check" :href="route('health-records.index')" :current="request()->routeIs('health-records.*')" wire:navigate>
@@ -35,13 +33,15 @@
                     <flux:sidebar.item icon="scale" :href="route('weight-logs.index')" :current="request()->routeIs('weight-logs.*')" wire:navigate>
                         {{ __('Weight Logs') }}
                     </flux:sidebar.item>
+                </flux:sidebar.group>
 
+                <flux:sidebar.group :heading="__('Analytics')" class="grid">
                     <flux:sidebar.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.*')" wire:navigate>
                         {{ __('Reports') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="building-office-2" :href="route('farm.edit')" :current="request()->routeIs('farm.*')" wire:navigate>
-                        {{ __('Farm') }}
+                    <flux:sidebar.item icon="bell-alert" :href="route('upcoming.index')" :current="request()->routeIs('upcoming.*')" wire:navigate>
+                        {{ __('Upcoming') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
@@ -49,13 +49,15 @@
             <flux:spacer />
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
+                <flux:sidebar.group :heading="__('Management')" class="grid">
+                    <flux:sidebar.item icon="building-office-2" :href="route('farm.edit')" :current="request()->routeIs('farm.*')" wire:navigate>
+                        {{ __('Farm') }}
+                    </flux:sidebar.item>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
+{{--                    <flux:sidebar.item icon="users" :href="route('farm.edit')" :current="request()->routeIs('farm.*')" wire:navigate>--}}
+{{--                        {{ __('Employees') }}--}}
+{{--                    </flux:sidebar.item>--}}
+                </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
