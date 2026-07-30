@@ -92,3 +92,22 @@ test('animal options only include animals from the current farm', function () {
     expect($animalOptions->pluck('id'))->toContain($ownAnimal->id)
         ->and($animalOptions->count())->toBe(1);
 });
+
+test('opening the weight log modal dispatches the open event with the animal and weight log ids', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+    $weightLog = WeightLog::factory()->for($animal)->create();
+
+    Livewire::test(WeightLogsIndex::class)
+        ->call('openWeightLogModal', $animal->id, $weightLog->id)
+        ->assertDispatched('open-weight-log-modal', animalId: $animal->id, weightLogId: $weightLog->id);
+});
+
+test('opening the weight log modal for a new log dispatches the open event with only the animal id', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+
+    Livewire::test(WeightLogsIndex::class)
+        ->call('openWeightLogModal', $animal->id)
+        ->assertDispatched('open-weight-log-modal', animalId: $animal->id, weightLogId: null);
+});
