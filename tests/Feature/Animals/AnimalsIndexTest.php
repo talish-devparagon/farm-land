@@ -4,6 +4,7 @@ use App\Enums\AnimalStatus;
 use App\Livewire\Animals\AnimalsIndex;
 use App\Models\Animal;
 use App\Models\Farm;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 test('animals index page is displayed', function () {
@@ -53,4 +54,24 @@ test('animals index can be filtered by status', function () {
         ->animals();
 
     expect($animals->pluck('id')->all())->toBe([$alive->id]);
+});
+
+test('can delete an animal from the index', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+
+    Livewire::test(AnimalsIndex::class)
+        ->call('delete', $animal->id);
+
+    expect(Animal::find($animal->id))->toBeNull();
+});
+
+test('cannot delete an animal belonging to another farm', function () {
+    $this->actingAsFarmOwner();
+
+    $otherFarm = Farm::factory()->create();
+    $otherAnimal = Animal::factory()->for($otherFarm)->create();
+
+    expect(fn () => Livewire::test(AnimalsIndex::class)->call('delete', $otherAnimal->id))
+        ->toThrow(ModelNotFoundException::class);
 });

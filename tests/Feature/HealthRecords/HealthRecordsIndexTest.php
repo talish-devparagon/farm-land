@@ -5,6 +5,7 @@ use App\Livewire\HealthRecords\HealthRecordsIndex;
 use App\Models\Animal;
 use App\Models\Farm;
 use App\Models\HealthRecord;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 test('health records index page is displayed', function () {
@@ -133,4 +134,26 @@ test('opening the health record modal for a new record dispatches the open event
     Livewire::test(HealthRecordsIndex::class)
         ->call('openHealthRecordModal', $animal->id)
         ->assertDispatched('open-health-record-modal', animalId: $animal->id, healthRecordId: null);
+});
+
+test('can delete a health record from the index', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+    $healthRecord = HealthRecord::factory()->for($animal)->for($user->farm)->create();
+
+    Livewire::test(HealthRecordsIndex::class)
+        ->call('deleteHealthRecord', $healthRecord->id);
+
+    expect(HealthRecord::find($healthRecord->id))->toBeNull();
+});
+
+test('cannot delete a health record belonging to another farm', function () {
+    $this->actingAsFarmOwner();
+
+    $otherFarm = Farm::factory()->create();
+    $otherAnimal = Animal::factory()->for($otherFarm)->create();
+    $otherHealthRecord = HealthRecord::factory()->for($otherAnimal)->for($otherFarm)->create();
+
+    expect(fn () => Livewire::test(HealthRecordsIndex::class)->call('deleteHealthRecord', $otherHealthRecord->id))
+        ->toThrow(ModelNotFoundException::class);
 });

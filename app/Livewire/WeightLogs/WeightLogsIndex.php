@@ -2,6 +2,7 @@
 
 namespace App\Livewire\WeightLogs;
 
+use App\Actions\RecalculateAnimalCurrentWeightAction;
 use App\Models\Animal;
 use App\Models\WeightLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -78,5 +79,18 @@ class WeightLogsIndex extends Component
     public function openWeightLogModal(?int $animalId = null, ?int $weightLogId = null): void
     {
         $this->dispatch('open-weight-log-modal', animalId: $animalId, weightLogId: $weightLogId);
+    }
+
+    public function deleteWeightLog(int $weightLogId, RecalculateAnimalCurrentWeightAction $recalculateAnimalCurrentWeight): void
+    {
+        $weightLog = WeightLog::query()->whereHas('animal')->with('animal')->findOrFail($weightLogId);
+
+        Gate::authorize('update', $weightLog->animal);
+
+        $animal = $weightLog->animal;
+
+        $weightLog->delete();
+
+        $recalculateAnimalCurrentWeight->handle($animal);
     }
 }

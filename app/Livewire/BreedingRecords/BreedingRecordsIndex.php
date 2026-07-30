@@ -103,4 +103,13 @@ class BreedingRecordsIndex extends Component
     {
         $this->dispatch('open-breeding-record-modal', doeId: $doeId, breedingRecordId: $breedingRecordId);
     }
+
+    public function deleteBreedingRecord(int $breedingRecordId): void
+    {
+        $breedingRecord = BreedingRecord::with('doe')->findOrFail($breedingRecordId);
+
+        Gate::authorize('update', $breedingRecord->doe);
+
+        $breedingRecord->delete();
+    }
 }

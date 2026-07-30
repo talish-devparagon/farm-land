@@ -95,4 +95,13 @@ class HealthRecordsIndex extends Component
     {
         $this->dispatch('open-health-record-modal', animalId: $animalId, healthRecordId: $healthRecordId);
     }
+
+    public function deleteHealthRecord(int $healthRecordId): void
+    {
+        $healthRecord = HealthRecord::with('animal')->findOrFail($healthRecordId);
+
+        Gate::authorize('update', $healthRecord->animal);
+
+        $healthRecord->delete();
+    }
 }
