@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ newDoeId: '' }">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Breeding Records') }}</flux:heading>
@@ -52,7 +52,7 @@
                 <flux:table.column>{{ __('Actual kidding') }}</flux:table.column>
                 <flux:table.column>{{ __('Offspring') }}</flux:table.column>
                 <flux:table.column>{{ __('Status') }}</flux:table.column>
-                <flux:table.column></flux:table.column>
+                <flux:table.column>{{ __('Actions') }}</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
@@ -88,11 +88,12 @@
                         <flux:table.cell>
                             <flux:button
                                 size="sm"
-                                variant="filled"
+                                variant="subtle"
+                                icon="pencil"
+                                tooltip="{{ __('Edit breeding record') }}"
+                                aria-label="{{ __('Edit breeding record') }}"
                                 wire:click="openBreedingRecordModal({{ $breedingRecord->doe_id }}, {{ $breedingRecord->id }})"
-                            >
-                                {{ __('Edit') }}
-                            </flux:button>
+                            />
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

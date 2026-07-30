@@ -10,7 +10,7 @@
         </flux:button>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap items-end gap-3">
         <flux:input
             wire:model.live="search"
             icon="magnifying-glass"
@@ -46,6 +46,7 @@
                 <flux:table.column>{{ __('Name') }}</flux:table.column>
                 <flux:table.column>{{ __('Breed') }}</flux:table.column>
                 <flux:table.column>{{ __('Status') }}</flux:table.column>
+                <flux:table.column>{{ __('Actions') }}</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
@@ -60,6 +61,17 @@
                         <flux:table.cell>{{ $animal->breed ?? '—' }}</flux:table.cell>
                         <flux:table.cell>
                             <x-animal-status-badge :status="$animal->status" />
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <flux:button
+                                size="sm"
+                                variant="subtle"
+                                icon="pencil"
+                                tooltip="{{ __('Edit animal') }}"
+                                aria-label="{{ __('Edit animal') }}"
+                                href="{{ route('animals.edit', $animal) }}"
+                                wire:navigate
+                            />
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

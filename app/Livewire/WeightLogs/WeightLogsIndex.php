@@ -68,4 +68,15 @@ class WeightLogsIndex extends Component
             ->orderBy('tag_number')
             ->get(['id', 'tag_number', 'name']);
     }
+
+    /**
+     * Open the create/edit weight log modal.
+     *
+     * Pass only `$animalId` to create a new log for that animal, or both
+     * `$animalId` and `$weightLogId` to edit an existing log.
+     */
+    public function openWeightLogModal(?int $animalId = null, ?int $weightLogId = null): void
+    {
+        $this->dispatch('open-weight-log-modal', animalId: $animalId, weightLogId: $weightLogId);
+    }
 }

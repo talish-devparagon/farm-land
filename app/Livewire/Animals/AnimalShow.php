@@ -3,6 +3,7 @@
 namespace App\Livewire\Animals;
 
 use App\Actions\RecalculateAnimalCurrentWeightAction;
+use App\Concerns\WeightLogValidationRules;
 use App\Models\Animal;
 use App\Models\BreedingRecord;
 use App\Models\HealthRecord;
@@ -16,6 +17,8 @@ use Livewire\Component;
 #[Title('Animal')]
 class AnimalShow extends Component
 {
+    use WeightLogValidationRules;
+
     public Animal $animal;
 
     public string $activeTab = 'health';
@@ -35,10 +38,7 @@ class AnimalShow extends Component
     {
         Gate::authorize('update', $this->animal);
 
-        $this->validate([
-            'weight' => ['required', 'numeric', 'min:0'],
-            'recorded_at' => ['required', 'date', 'before_or_equal:today'],
-        ]);
+        $this->validate($this->weightLogRules());
 
         $this->animal->weightLogs()->create([
             'weight' => $this->weight,
