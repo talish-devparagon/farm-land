@@ -5,24 +5,9 @@
             <flux:text class="mt-1">{{ __('Track matings and kidding across the whole farm.') }}</flux:text>
         </div>
 
-        <div class="flex items-end gap-2" x-data="{ newDoeId: '' }">
-            <flux:select x-model="newDoeId" placeholder="{{ __('Select a doe') }}" class="max-w-xs">
-                @foreach ($this->doeOptions as $doe)
-                    <flux:select.option value="{{ $doe->id }}">
-                        {{ $doe->tag_number }}{{ $doe->name ? ' · '.$doe->name : '' }}
-                    </flux:select.option>
-                @endforeach
-            </flux:select>
-
-            <flux:button
-                variant="primary"
-                icon="plus"
-                x-bind:disabled="!newDoeId"
-                x-on:click="$wire.openBreedingRecordModal(Number(newDoeId))"
-            >
-                {{ __('New breeding record') }}
-            </flux:button>
-        </div>
+        <flux:button variant="primary" icon="plus" wire:click="openBreedingRecordModal">
+            {{ __('New breeding record') }}
+        </flux:button>
     </div>
 
     <div class="flex flex-wrap items-end gap-3">

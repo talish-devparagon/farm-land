@@ -1,28 +1,13 @@
-<div class="space-y-6" x-data="{ newRecordAnimalId: '' }">
+<div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Health Records') }}</flux:heading>
             <flux:text class="mt-1">{{ __('Track vaccinations, treatments, and vet visits across the farm.') }}</flux:text>
         </div>
 
-        <div class="flex flex-wrap items-end gap-2">
-            <flux:select x-model="newRecordAnimalId" placeholder="{{ __('Choose an animal') }}" class="max-w-44">
-                @foreach ($this->animalOptions as $animal)
-                    <flux:select.option value="{{ $animal->id }}">
-                        {{ $animal->tag_number }}{{ $animal->name ? ' · '.$animal->name : '' }}
-                    </flux:select.option>
-                @endforeach
-            </flux:select>
-
-            <flux:button
-                variant="primary"
-                icon="plus"
-                x-on:click="newRecordAnimalId && $wire.openHealthRecordModal(newRecordAnimalId)"
-                x-bind:disabled="!newRecordAnimalId"
-            >
-                {{ __('New health record') }}
-            </flux:button>
-        </div>
+        <flux:button variant="primary" icon="plus" wire:click="openHealthRecordModal">
+            {{ __('New health record') }}
+        </flux:button>
     </div>
 
     <div class="flex flex-wrap items-end gap-3">

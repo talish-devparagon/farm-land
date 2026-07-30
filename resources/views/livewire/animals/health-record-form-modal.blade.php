@@ -7,6 +7,19 @@
                 </flux:heading>
             </div>
 
+            <flux:select
+                wire:model="animalId"
+                :label="__('Animal')"
+                placeholder="{{ __('Choose an animal') }}"
+                :disabled="$animalLocked || $healthRecordId"
+            >
+                @foreach ($this->animalOptions as $option)
+                    <flux:select.option value="{{ $option->id }}">
+                        {{ $option->tag_number }}{{ $option->name ? ' · '.$option->name : '' }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
             <flux:select wire:model="type" :label="__('Type')" placeholder="{{ __('Select type') }}">
                 @foreach (\App\Enums\HealthRecordType::cases() as $case)
                     <flux:select.option value="{{ $case->value }}">{{ ucfirst(str_replace('_', ' ', $case->value)) }}</flux:select.option>
