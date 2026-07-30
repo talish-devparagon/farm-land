@@ -15,9 +15,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('animals', AnimalsIndex::class)->name('animals.index');
     Route::livewire('animals/create', AnimalForm::class)->name('animals.create');
     Route::livewire('animals/{animal}/edit', AnimalForm::class)->name('animals.edit');
-    Route::livewire('animals/{animal}', Upcoming::class)->name('animals.show');
+    Route::livewire('animals/{animal}', AnimalShow::class)->name('animals.show');
 
-    Route::livewire('upcoming', AnimalShow::class)->name('upcoming.index');
+    Route::livewire('upcoming', Upcoming::class)->name('upcoming.index');
 });
 
 require __DIR__.'/settings.php';
