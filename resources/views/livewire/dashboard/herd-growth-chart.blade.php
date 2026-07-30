@@ -21,7 +21,7 @@
                 height="{{ $bar['height'] }}"
                 rx="1"
                 fill="url(#growthBarGradient)"
-                class="drop-shadow-sm drop-shadow-cyan-600 motion-safe:transition-opacity motion-safe:duration-300 hover:opacity-75"
+                class="drop-shadow-sm drop-shadow-cyan-600/60 motion-safe:transition-opacity motion-safe:duration-300 hover:opacity-75"
             >
                 <title>{{ $bar['label'] }}: {{ __(':count new', ['count' => $bar['value']]) }}</title>
             </rect>

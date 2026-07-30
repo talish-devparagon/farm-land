@@ -26,7 +26,7 @@
                                     </flux:link>
                                 </flux:table.cell>
                                 <flux:table.cell>
-                                    <flux:badge color="blue" size="sm">{{ $healthRecord->type->value }}</flux:badge>
+                                    <flux:badge color="blue" size="sm" class="capitalize">{{ $healthRecord->type->value }}</flux:badge>
                                 </flux:table.cell>
                                 <flux:table.cell>{{ $healthRecord->next_due_date->toFormattedDateString() }}</flux:table.cell>
                             </flux:table.row>
