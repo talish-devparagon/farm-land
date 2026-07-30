@@ -65,5 +65,5 @@ test('opening the breeding record modal dispatches an event with the record id',
 
     Livewire::test(AnimalShow::class, ['animal' => $animal])
         ->call('openBreedingRecordModal', 7)
-        ->assertDispatched('open-breeding-record-modal', id: 7);
+        ->assertDispatched('open-breeding-record-modal', breedingRecordId: 7);
 });

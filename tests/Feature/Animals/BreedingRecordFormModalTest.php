@@ -3,6 +3,8 @@
 use App\Enums\AnimalSex;
 use App\Livewire\Animals\BreedingRecordFormModal;
 use App\Models\Animal;
+use App\Models\Farm;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 test('can create a breeding record', function () {
@@ -86,6 +88,52 @@ test('offspring tag numbers must be unique within the farm', function () {
         ])
         ->call('save')
         ->assertHasErrors(['offspring.0.tag_number']);
+});
+
+test('can create a breeding record by resolving the doe from an id when no animal is bound', function () {
+    $user = $this->actingAsFarmOwner();
+    $doe = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Female]);
+    $buck = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Male]);
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open', doeId: $doe->id)
+        ->set('buck_id', $buck->id)
+        ->set('mating_date', now()->subMonth()->toDateString())
+        ->set('expected_kidding_date', now()->addMonths(4)->toDateString())
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertDispatched('breeding-record-saved');
+
+    expect($doe->breedingRecordsAsDoe()->count())->toBe(1);
+});
+
+test('can edit an existing breeding record by resolving the doe from an id when no animal is bound', function () {
+    $user = $this->actingAsFarmOwner();
+    $doe = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Female]);
+    $breedingRecord = $doe->breedingRecordsAsDoe()->create([
+        'farm_id' => $user->farm->id,
+        'mating_date' => now()->subMonth(),
+        'expected_kidding_date' => now()->addMonths(4),
+    ]);
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open', breedingRecordId: $breedingRecord->id, doeId: $doe->id)
+        ->assertSet('breedingRecordId', $breedingRecord->id)
+        ->set('notes', 'Updated notes')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertDispatched('breeding-record-saved');
+
+    expect($doe->breedingRecordsAsDoe()->firstOrFail()->notes)->toBe('Updated notes');
+});
+
+test('cannot resolve a doe belonging to another farm via doeId', function () {
+    $this->actingAsFarmOwner();
+    $otherFarm = Farm::factory()->create();
+    $otherDoe = Animal::factory()->for($otherFarm)->create(['sex' => AnimalSex::Female]);
+
+    expect(fn () => Livewire::test(BreedingRecordFormModal::class)->call('open', doeId: $otherDoe->id))
+        ->toThrow(ModelNotFoundException::class);
 });
 
 test('can delete a breeding record', function () {

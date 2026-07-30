@@ -23,6 +23,26 @@
                     <flux:sidebar.item icon="bell-alert" :href="route('upcoming.index')" :current="request()->routeIs('upcoming.*')" wire:navigate>
                         {{ __('Upcoming') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="shield-check" :href="route('health-records.index')" :current="request()->routeIs('health-records.*')" wire:navigate>
+                        {{ __('Health Records') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="sparkles" :href="route('breeding-records.index')" :current="request()->routeIs('breeding-records.*')" wire:navigate>
+                        {{ __('Breeding Records') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="scale" :href="route('weight-logs.index')" :current="request()->routeIs('weight-logs.*')" wire:navigate>
+                        {{ __('Weight Logs') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.*')" wire:navigate>
+                        {{ __('Reports') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="building-office-2" :href="route('farm.edit')" :current="request()->routeIs('farm.*')" wire:navigate>
+                        {{ __('Farm') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

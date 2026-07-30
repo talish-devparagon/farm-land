@@ -12,7 +12,7 @@ class HealthRecordFormModal extends Component
 {
     use HealthRecordValidationRules;
 
-    public Animal $animal;
+    public ?Animal $animal = null;
 
     public bool $show = false;
 
@@ -28,9 +28,25 @@ class HealthRecordFormModal extends Component
 
     public ?string $notes = null;
 
+    /**
+     * Open the modal to create or edit a health record.
+     *
+     * When `$animalId` is provided, the animal is resolved from it (used
+     * when this component is rendered without a bound `$animal`, e.g. on
+     * the farm-wide health records index). Otherwise, the `$animal`
+     * already bound to this component (e.g. via `AnimalShow`) is used.
+     *
+     * `$healthRecordId` remains the first parameter (rather than
+     * `$animalId`) so existing single-argument callers (e.g.
+     * `open($healthRecordId)` from `AnimalShow`) keep working unchanged.
+     */
     #[On('open-health-record-modal')]
-    public function open(?int $healthRecordId = null): void
+    public function open(?int $healthRecordId = null, ?int $animalId = null): void
     {
+        if ($animalId) {
+            $this->animal = Animal::findOrFail($animalId);
+        }
+
         Gate::authorize('update', $this->animal);
 
         $this->reset('healthRecordId', 'type', 'description', 'date', 'next_due_date', 'notes');

@@ -14,7 +14,7 @@ class BreedingRecordFormModal extends Component
 {
     use BreedingRecordValidationRules;
 
-    public Animal $animal;
+    public ?Animal $animal = null;
 
     public bool $show = false;
 
@@ -37,9 +37,25 @@ class BreedingRecordFormModal extends Component
      */
     public array $offspring = [];
 
+    /**
+     * Open the modal to create or edit a breeding record.
+     *
+     * When `$doeId` is provided, the doe is resolved from it (used when this
+     * component is rendered without a bound `$animal`, e.g. on the farm-wide
+     * breeding records index). Otherwise, the `$animal` already bound to this
+     * component (e.g. via `AnimalShow`) is used.
+     *
+     * `$breedingRecordId` remains the first parameter (rather than `$doeId`)
+     * so existing single-argument callers (e.g. `open($breedingRecordId)`
+     * from `AnimalShow`) keep working unchanged.
+     */
     #[On('open-breeding-record-modal')]
-    public function open(?int $id = null): void
+    public function open(?int $breedingRecordId = null, ?int $doeId = null): void
     {
+        if ($doeId) {
+            $this->animal = Animal::findOrFail($doeId);
+        }
+
         Gate::authorize('update', $this->animal);
 
         $this->reset(
@@ -48,8 +64,8 @@ class BreedingRecordFormModal extends Component
         );
         $this->resetValidation();
 
-        if ($id) {
-            $breedingRecord = $this->animal->breedingRecordsAsDoe()->findOrFail($id);
+        if ($breedingRecordId) {
+            $breedingRecord = $this->animal->breedingRecordsAsDoe()->findOrFail($breedingRecordId);
 
             $this->breedingRecordId = $breedingRecord->id;
             $this->buck_id = $breedingRecord->buck_id;

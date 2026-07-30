@@ -70,7 +70,7 @@ class AnimalShow extends Component
 
     public function openBreedingRecordModal(?int $id = null): void
     {
-        $this->dispatch('open-breeding-record-modal', id: $id);
+        $this->dispatch('open-breeding-record-modal', breedingRecordId: $id);
     }
 
     /**

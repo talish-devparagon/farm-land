@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard;
 
 use App\Actions\Dashboard\GetRecentMonthsAction;
+use App\Concerns\ComputesLineChartGeometry;
 use App\Models\Animal;
 use App\Models\WeightLog;
 use Illuminate\Support\Collection;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class WeightTrendChart extends Component
 {
+    use ComputesLineChartGeometry;
+
     /**
      * Average recorded weight per month, keyed by month label, for the last 6 months.
      * Falls back to the herd's current average weight, spread flat across every
@@ -48,7 +51,7 @@ class WeightTrendChart extends Component
     #[Computed]
     public function hasData(): bool
     {
-        return collect($this->weightTrend())->contains(fn (?float $value): bool => $value !== null);
+        return $this->lineChartHasData($this->weightTrend());
     }
 
     /**
@@ -60,54 +63,7 @@ class WeightTrendChart extends Component
     #[Computed]
     public function points(): Collection
     {
-        $weights = $this->weightTrend();
-
-        if (! $this->hasData()) {
-            return collect();
-        }
-
-        $weightValues = collect($weights)->filter(fn (?float $value): bool => $value !== null);
-        $min = $weightValues->min();
-        $max = $weightValues->max();
-        $range = max($max - $min, 1);
-        $count = count($weights);
-        $slot = 100 / max($count - 1, 1);
-
-        return collect($weights)->values()->map(function (?float $value, int $index) use ($slot, $min, $range, $weights): array {
-            return [
-                'label' => array_keys($weights)[$index],
-                'value' => $value,
-                'x' => round($slot * $index, 2),
-                'y' => $value !== null ? round(90 - (($value - $min) / $range) * 75, 2) : null,
-            ];
-        });
-    }
-
-    /**
-     * Contiguous runs of points with data, split wherever a month has no data,
-     * so the line/area paths don't falsely connect across a gap.
-     *
-     * @return Collection<int, Collection<int, array{label: string, value: float|null, x: float, y: float|null}>>
-     */
-    private function segments(): Collection
-    {
-        $segments = collect();
-        $current = collect();
-
-        foreach ($this->points() as $point) {
-            if ($point['y'] !== null) {
-                $current->push($point);
-            } elseif ($current->isNotEmpty()) {
-                $segments->push($current);
-                $current = collect();
-            }
-        }
-
-        if ($current->isNotEmpty()) {
-            $segments->push($current);
-        }
-
-        return $segments;
+        return $this->lineChartPoints($this->weightTrend());
     }
 
     /**
@@ -118,11 +74,7 @@ class WeightTrendChart extends Component
     #[Computed]
     public function linePaths(): array
     {
-        return $this->segments()
-            ->map(fn (Collection $segment): string => $segment->values()
-                ->map(fn (array $point, int $index): string => ($index === 0 ? 'M' : 'L').$point['x'].','.$point['y'])
-                ->implode(' '))
-            ->all();
+        return $this->lineChartLinePaths($this->weightTrend());
     }
 
     /**
@@ -134,10 +86,6 @@ class WeightTrendChart extends Component
     #[Computed]
     public function areaPaths(): array
     {
-        return $this->segments()->map(function (Collection $segment): string {
-            $line = $segment->map(fn (array $point): string => 'L'.$point['x'].','.$point['y'])->implode(' ');
-
-            return 'M'.$segment->first()['x'].',98 '.$line.' L'.$segment->last()['x'].',98 Z';
-        })->all();
+        return $this->lineChartAreaPaths($this->weightTrend());
     }
 }
