@@ -75,14 +75,17 @@
                                     size="sm"
                                     variant="subtle"
                                     icon="pencil"
+                                    class="hover:text-cyan-600!"
                                     tooltip="{{ __('Edit weight log') }}"
                                     aria-label="{{ __('Edit weight log') }}"
                                     wire:click="openWeightLogModal({{ $log->animal_id }}, {{ $log->id }})"
                                 />
                                 <flux:button
                                     size="sm"
-                                    variant="danger"
+                                    variant="subtle"
                                     icon="trash"
+                                    iconVariant="outline"
+                                    class="text-red-500!"
                                     tooltip="{{ __('Delete weight log') }}"
                                     aria-label="{{ __('Delete weight log') }}"
                                     wire:click="deleteWeightLog({{ $log->id }})"

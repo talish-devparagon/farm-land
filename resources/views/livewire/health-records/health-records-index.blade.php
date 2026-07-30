@@ -79,14 +79,17 @@
                                     size="sm"
                                     variant="subtle"
                                     icon="pencil"
+                                    class="hover:text-cyan-600!"
                                     tooltip="{{ __('Edit health record') }}"
                                     aria-label="{{ __('Edit health record') }}"
                                     wire:click="openHealthRecordModal({{ $record->animal_id }}, {{ $record->id }})"
                                 />
                                 <flux:button
                                     size="sm"
-                                    variant="danger"
+                                    variant="subtle"
                                     icon="trash"
+                                    iconVariant="outline"
+                                    class="text-red-500!"
                                     tooltip="{{ __('Delete health record') }}"
                                     aria-label="{{ __('Delete health record') }}"
                                     wire:click="deleteHealthRecord({{ $record->id }})"

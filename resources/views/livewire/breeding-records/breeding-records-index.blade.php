@@ -91,14 +91,17 @@
                                     size="sm"
                                     variant="subtle"
                                     icon="pencil"
+                                    class="hover:text-cyan-600!"
                                     tooltip="{{ __('Edit breeding record') }}"
                                     aria-label="{{ __('Edit breeding record') }}"
                                     wire:click="openBreedingRecordModal({{ $breedingRecord->doe_id }}, {{ $breedingRecord->id }})"
                                 />
                                 <flux:button
                                     size="sm"
-                                    variant="danger"
+                                    variant="subtle"
                                     icon="trash"
+                                    iconVariant="outline"
+                                    class="text-red-500!"
                                     tooltip="{{ __('Delete breeding record') }}"
                                     aria-label="{{ __('Delete breeding record') }}"
                                     wire:click="deleteBreedingRecord({{ $breedingRecord->id }})"

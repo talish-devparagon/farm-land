@@ -68,6 +68,7 @@
                                     size="sm"
                                     variant="subtle"
                                     icon="pencil"
+                                    class="hover:text-cyan-600!"
                                     tooltip="{{ __('Edit animal') }}"
                                     aria-label="{{ __('Edit animal') }}"
                                     href="{{ route('animals.edit', $animal) }}"
@@ -75,8 +76,10 @@
                                 />
                                 <flux:button
                                     size="sm"
-                                    variant="danger"
+                                    variant="subtle"
                                     icon="trash"
+                                    iconVariant="outline"
+                                    class="text-red-500!"
                                     tooltip="{{ __('Delete animal') }}"
                                     aria-label="{{ __('Delete animal') }}"
                                     wire:click="delete({{ $animal->id }})"
