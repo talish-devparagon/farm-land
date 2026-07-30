@@ -20,3 +20,5 @@ fix(shift-manager): resolve isDirty false positive on date compare
 
 4. No AI attribution or generated-by text in the commit message
 5. Never commit if tests are failing or code has obvious syntax errors.
+6. If everything seems good then commit the changes with a proper commit and submit a PR and share me the link of the PR.
+7. If you are resolving the an issue them make sure to close it as well with a reference to the PR.
