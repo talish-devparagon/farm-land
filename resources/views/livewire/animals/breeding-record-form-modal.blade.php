@@ -7,8 +7,21 @@
                 </flux:heading>
             </div>
 
+            <flux:select
+                wire:model="animalId"
+                :label="__('Doe')"
+                placeholder="{{ __('Choose a doe') }}"
+                :disabled="$animalLocked || $breedingRecordId"
+            >
+                @foreach ($this->doeOptions as $option)
+                    <flux:select.option value="{{ $option->id }}">
+                        {{ $option->tag_number }}{{ $option->name ? ' · '.$option->name : '' }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
             <flux:select wire:model="buck_id" :label="__('Buck')" placeholder="{{ __('None') }}">
-                @foreach (\App\Models\Animal::query()->where('sex', \App\Enums\AnimalSex::Male->value)->orderBy('tag_number')->get() as $buck)
+                @foreach ($this->buckOptions as $buck)
                     <flux:select.option value="{{ $buck->id }}">{{ $buck->tag_number }}</flux:select.option>
                 @endforeach
             </flux:select>

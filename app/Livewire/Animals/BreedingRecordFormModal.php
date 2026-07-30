@@ -4,9 +4,14 @@ namespace App\Livewire\Animals;
 
 use App\Actions\CreateOffspringAnimalsAction;
 use App\Concerns\BreedingRecordValidationRules;
+use App\Enums\AnimalSex;
 use App\Models\Animal;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -16,7 +21,15 @@ class BreedingRecordFormModal extends Component
 
     public ?Animal $animal = null;
 
+    /**
+     * Whether `$animal` was bound by a parent component (e.g. `AnimalShow`)
+     * and must therefore stay fixed for the lifetime of this component.
+     */
+    public bool $animalLocked = false;
+
     public bool $show = false;
+
+    public ?int $animalId = null;
 
     public ?int $breedingRecordId = null;
 
@@ -37,13 +50,48 @@ class BreedingRecordFormModal extends Component
      */
     public array $offspring = [];
 
+    public function mount(?Animal $animal = null): void
+    {
+        $this->animal = $animal;
+        $this->animalLocked = $animal !== null;
+    }
+
+    /**
+     * Doe picker dropdown options, restricted to female animals on the current farm.
+     *
+     * @return Collection<int, Animal>
+     */
+    #[Computed]
+    public function doeOptions(): Collection
+    {
+        return Animal::query()
+            ->where('sex', AnimalSex::Female)
+            ->orderBy('tag_number')
+            ->get(['id', 'tag_number', 'name']);
+    }
+
+    /**
+     * Buck picker dropdown options, restricted to male animals on the current farm.
+     *
+     * @return Collection<int, Animal>
+     */
+    #[Computed]
+    public function buckOptions(): Collection
+    {
+        return Animal::query()
+            ->where('sex', AnimalSex::Male)
+            ->orderBy('tag_number')
+            ->get(['id', 'tag_number', 'name']);
+    }
+
     /**
      * Open the modal to create or edit a breeding record.
      *
-     * When `$doeId` is provided, the doe is resolved from it (used when this
-     * component is rendered without a bound `$animal`, e.g. on the farm-wide
-     * breeding records index). Otherwise, the `$animal` already bound to this
-     * component (e.g. via `AnimalShow`) is used.
+     * When `$doeId` is provided and the component is not locked to a bound
+     * animal, the doe is resolved from it (used when this component is
+     * rendered without a bound `$animal`, e.g. on the farm-wide breeding
+     * records index). Otherwise, the `$animal` already bound to this
+     * component (e.g. via `AnimalShow`) is used untouched.
      *
      * `$breedingRecordId` remains the first parameter (rather than `$doeId`)
      * so existing single-argument callers (e.g. `open($breedingRecordId)`
@@ -52,17 +100,23 @@ class BreedingRecordFormModal extends Component
     #[On('open-breeding-record-modal')]
     public function open(?int $breedingRecordId = null, ?int $doeId = null): void
     {
-        if ($doeId) {
-            $this->animal = Animal::findOrFail($doeId);
+        if (! $this->animalLocked) {
+            $this->animal = $doeId ? Animal::findOrFail($doeId) : null;
         }
 
-        Gate::authorize('update', $this->animal);
+        if ($this->animal) {
+            Gate::authorize('update', $this->animal);
+        } else {
+            Gate::authorize('create', Animal::class);
+        }
 
         $this->reset(
             'breedingRecordId', 'buck_id', 'mating_date', 'expected_kidding_date',
             'actual_kidding_date', 'notes', 'create_offspring', 'offspring',
         );
         $this->resetValidation();
+
+        $this->animalId = $this->animal?->id;
 
         if ($breedingRecordId) {
             $breedingRecord = $this->animal->breedingRecordsAsDoe()->findOrFail($breedingRecordId);
@@ -91,17 +145,31 @@ class BreedingRecordFormModal extends Component
 
     public function save(CreateOffspringAnimalsAction $createOffspringAnimals): void
     {
-        Gate::authorize('update', $this->animal);
-
         $recordingOffspring = $this->create_offspring && $this->actual_kidding_date && $this->offspring !== [];
 
-        $rules = $this->breedingRecordRules();
+        $farmId = Auth::user()?->farm?->id;
+
+        $rules = [
+            ...$this->breedingRecordRules(),
+            'animalId' => [
+                'required',
+                'integer',
+                Rule::exists(Animal::class, 'id')
+                    ->where('farm_id', $farmId)
+                    ->where('sex', AnimalSex::Female->value),
+            ],
+        ];
 
         if ($recordingOffspring) {
             $rules = [...$rules, ...$this->offspringRules()];
         }
 
         $validated = $this->validate($rules);
+
+        $animalId = Arr::pull($validated, 'animalId');
+        $animal = $this->animal ?? Animal::query()->findOrFail($animalId);
+
+        Gate::authorize('update', $animal);
 
         $breedingData = Arr::except($validated, 'offspring');
 
@@ -110,10 +178,10 @@ class BreedingRecordFormModal extends Component
         }
 
         if ($this->breedingRecordId) {
-            $breedingRecord = $this->animal->breedingRecordsAsDoe()->whereKey($this->breedingRecordId)->firstOrFail();
+            $breedingRecord = $animal->breedingRecordsAsDoe()->whereKey($this->breedingRecordId)->firstOrFail();
             $breedingRecord->update($breedingData);
         } else {
-            $breedingRecord = $this->animal->breedingRecordsAsDoe()->create($breedingData);
+            $breedingRecord = $animal->breedingRecordsAsDoe()->create($breedingData);
         }
 
         if ($recordingOffspring) {
