@@ -1,12 +1,12 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ newDoeId: '' }">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Breeding Records') }}</flux:heading>
             <flux:text class="mt-1">{{ __('Track matings and kidding across the whole farm.') }}</flux:text>
         </div>
 
-        <div class="flex items-end gap-2" x-data="{ newDoeId: '' }">
-            <flux:select x-model="newDoeId" placeholder="{{ __('Select a doe') }}" class="max-w-xs">
+        <div class="flex flex-wrap items-end gap-2">
+            <flux:select x-model="newDoeId" placeholder="{{ __('Select a doe') }}" class="max-w-44">
                 @foreach ($this->doeOptions as $doe)
                     <flux:select.option value="{{ $doe->id }}">
                         {{ $doe->tag_number }}{{ $doe->name ? ' · '.$doe->name : '' }}
@@ -67,7 +67,7 @@
                 <flux:table.column>{{ __('Actual kidding') }}</flux:table.column>
                 <flux:table.column>{{ __('Offspring') }}</flux:table.column>
                 <flux:table.column>{{ __('Status') }}</flux:table.column>
-                <flux:table.column></flux:table.column>
+                <flux:table.column>{{ __('Actions') }}</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
@@ -103,11 +103,12 @@
                         <flux:table.cell>
                             <flux:button
                                 size="sm"
-                                variant="filled"
+                                variant="subtle"
+                                icon="pencil"
+                                tooltip="{{ __('Edit breeding record') }}"
+                                aria-label="{{ __('Edit breeding record') }}"
                                 wire:click="openBreedingRecordModal({{ $breedingRecord->doe_id }}, {{ $breedingRecord->id }})"
-                            >
-                                {{ __('Edit') }}
-                            </flux:button>
+                            />
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach
