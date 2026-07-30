@@ -13,6 +13,7 @@ test('can create a health record', function () {
 
     Livewire::test(HealthRecordFormModal::class, ['animal' => $animal])
         ->call('open')
+        ->assertSet('animalId', $animal->id)
         ->set('type', HealthRecordType::Vaccination->value)
         ->set('description', 'Annual shots')
         ->set('date', now()->toDateString())
@@ -117,4 +118,60 @@ test('cannot resolve an animal from another farm when opening via an animal id',
 
     expect(fn () => Livewire::test(HealthRecordFormModal::class)->call('open', animalId: $otherAnimal->id))
         ->toThrow(ModelNotFoundException::class);
+});
+
+test('opening fully unbound with no ids leaves the animal and picker empty', function () {
+    $this->actingAsFarmOwner();
+
+    Livewire::test(HealthRecordFormModal::class)
+        ->call('open')
+        ->assertSet('animal', null)
+        ->assertSet('animalId', null);
+});
+
+test('saving unbound without selecting an animal fails validation', function () {
+    $this->actingAsFarmOwner();
+
+    Livewire::test(HealthRecordFormModal::class)
+        ->call('open')
+        ->set('type', HealthRecordType::Vaccination->value)
+        ->set('description', 'Annual shots')
+        ->set('date', now()->toDateString())
+        ->call('save')
+        ->assertHasErrors('animalId');
+});
+
+test('saving unbound after selecting an animal creates the record', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+
+    Livewire::test(HealthRecordFormModal::class)
+        ->call('open')
+        ->set('animalId', $animal->id)
+        ->set('type', HealthRecordType::Vaccination->value)
+        ->set('description', 'Annual shots')
+        ->set('date', now()->toDateString())
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertDispatched('health-record-saved');
+
+    expect($animal->healthRecords()->count())->toBe(1);
+});
+
+test('opening for a fresh create after editing an existing record does not leave the animal stale', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+    $healthRecord = $animal->healthRecords()->create([
+        'farm_id' => $user->farm->id,
+        'type' => HealthRecordType::Vaccination,
+        'description' => 'Original',
+        'date' => now(),
+    ]);
+
+    Livewire::test(HealthRecordFormModal::class)
+        ->call('open', animalId: $animal->id, healthRecordId: $healthRecord->id)
+        ->assertSet('animal.id', $animal->id)
+        ->call('open')
+        ->assertSet('animal', null)
+        ->assertSet('animalId', null);
 });

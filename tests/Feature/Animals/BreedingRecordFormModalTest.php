@@ -14,6 +14,7 @@ test('can create a breeding record', function () {
 
     Livewire::test(BreedingRecordFormModal::class, ['animal' => $doe])
         ->call('open')
+        ->assertSet('animalId', $doe->id)
         ->set('buck_id', $buck->id)
         ->set('mating_date', now()->subMonth()->toDateString())
         ->set('expected_kidding_date', now()->addMonths(4)->toDateString())
@@ -134,6 +135,56 @@ test('cannot resolve a doe belonging to another farm via doeId', function () {
 
     expect(fn () => Livewire::test(BreedingRecordFormModal::class)->call('open', doeId: $otherDoe->id))
         ->toThrow(ModelNotFoundException::class);
+});
+
+test('opening fully unbound with no ids leaves the animal and picker empty', function () {
+    $this->actingAsFarmOwner();
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open')
+        ->assertSet('animal', null)
+        ->assertSet('animalId', null);
+});
+
+test('saving unbound without selecting a doe fails validation', function () {
+    $this->actingAsFarmOwner();
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open')
+        ->set('mating_date', now()->subMonth()->toDateString())
+        ->set('expected_kidding_date', now()->addMonths(4)->toDateString())
+        ->call('save')
+        ->assertHasErrors('animalId');
+});
+
+test('saving unbound with a non-female animal id fails validation', function () {
+    $user = $this->actingAsFarmOwner();
+    $male = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Male]);
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open')
+        ->set('animalId', $male->id)
+        ->set('mating_date', now()->subMonth()->toDateString())
+        ->set('expected_kidding_date', now()->addMonths(4)->toDateString())
+        ->call('save')
+        ->assertHasErrors('animalId');
+});
+
+test('opening for a fresh create after editing an existing breeding record does not leave the animal stale', function () {
+    $user = $this->actingAsFarmOwner();
+    $doe = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Female]);
+    $breedingRecord = $doe->breedingRecordsAsDoe()->create([
+        'farm_id' => $user->farm->id,
+        'mating_date' => now()->subMonth(),
+        'expected_kidding_date' => now()->addMonths(4),
+    ]);
+
+    Livewire::test(BreedingRecordFormModal::class)
+        ->call('open', doeId: $doe->id, breedingRecordId: $breedingRecord->id)
+        ->assertSet('animal.id', $doe->id)
+        ->call('open')
+        ->assertSet('animal', null)
+        ->assertSet('animalId', null);
 });
 
 test('can delete a breeding record', function () {
