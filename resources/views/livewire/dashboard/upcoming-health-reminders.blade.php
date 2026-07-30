@@ -16,7 +16,7 @@
                         <flux:link href="{{ route('animals.show', $healthRecord->animal) }}" wire:navigate class="font-medium">{{ $healthRecord->animal->tag_number }}</flux:link>
                         <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ $healthRecord->next_due_date->toFormattedDateString() }}</flux:text>
                     </div>
-                    <flux:badge color="blue" size="sm">{{ $healthRecord->type->value }}</flux:badge>
+                    <flux:badge color="blue" size="sm" class="capitalize">{{ $healthRecord->type->value }}</flux:badge>
                 </li>
             @endforeach
         </ul>
