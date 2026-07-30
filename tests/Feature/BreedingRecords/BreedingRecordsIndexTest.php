@@ -5,6 +5,7 @@ use App\Livewire\BreedingRecords\BreedingRecordsIndex;
 use App\Models\Animal;
 use App\Models\BreedingRecord;
 use App\Models\Farm;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 test('breeding records index page is displayed', function () {
@@ -168,4 +169,26 @@ test('opening the breeding record modal for a new record dispatches the open eve
     Livewire::test(BreedingRecordsIndex::class)
         ->call('openBreedingRecordModal', $doe->id)
         ->assertDispatched('open-breeding-record-modal', doeId: $doe->id, breedingRecordId: null);
+});
+
+test('can delete a breeding record from the index', function () {
+    $user = $this->actingAsFarmOwner();
+    $doe = Animal::factory()->for($user->farm)->create(['sex' => AnimalSex::Female]);
+    $breedingRecord = BreedingRecord::factory()->for($user->farm)->for($doe, 'doe')->create();
+
+    Livewire::test(BreedingRecordsIndex::class)
+        ->call('deleteBreedingRecord', $breedingRecord->id);
+
+    expect(BreedingRecord::find($breedingRecord->id))->toBeNull();
+});
+
+test('cannot delete a breeding record belonging to another farm', function () {
+    $this->actingAsFarmOwner();
+
+    $otherFarm = Farm::factory()->create();
+    $otherDoe = Animal::factory()->for($otherFarm)->create(['sex' => AnimalSex::Female]);
+    $otherBreedingRecord = BreedingRecord::factory()->for($otherFarm)->for($otherDoe, 'doe')->create();
+
+    expect(fn () => Livewire::test(BreedingRecordsIndex::class)->call('deleteBreedingRecord', $otherBreedingRecord->id))
+        ->toThrow(ModelNotFoundException::class);
 });

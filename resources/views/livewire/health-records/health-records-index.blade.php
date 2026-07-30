@@ -89,14 +89,25 @@
                         <flux:table.cell>{{ $record->date->toFormattedDateString() }}</flux:table.cell>
                         <flux:table.cell>{{ $record->next_due_date?->toFormattedDateString() ?? '—' }}</flux:table.cell>
                         <flux:table.cell>
-                            <flux:button
-                                size="sm"
-                                variant="subtle"
-                                icon="pencil"
-                                tooltip="{{ __('Edit health record') }}"
-                                aria-label="{{ __('Edit health record') }}"
-                                wire:click="openHealthRecordModal({{ $record->animal_id }}, {{ $record->id }})"
-                            />
+                            <div class="flex items-center gap-1">
+                                <flux:button
+                                    size="sm"
+                                    variant="subtle"
+                                    icon="pencil"
+                                    tooltip="{{ __('Edit health record') }}"
+                                    aria-label="{{ __('Edit health record') }}"
+                                    wire:click="openHealthRecordModal({{ $record->animal_id }}, {{ $record->id }})"
+                                />
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    icon="trash"
+                                    tooltip="{{ __('Delete health record') }}"
+                                    aria-label="{{ __('Delete health record') }}"
+                                    wire:click="deleteHealthRecord({{ $record->id }})"
+                                    wire:confirm="{{ __('Are you sure?') }}"
+                                />
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

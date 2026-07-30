@@ -70,4 +70,13 @@ class AnimalsIndex extends Component
     {
         return AnimalStatus::cases();
     }
+
+    public function delete(int $animalId): void
+    {
+        $animal = Animal::findOrFail($animalId);
+
+        Gate::authorize('delete', $animal);
+
+        $animal->delete();
+    }
 }

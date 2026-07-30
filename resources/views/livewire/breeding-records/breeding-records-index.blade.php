@@ -101,14 +101,25 @@
                             @endif
                         </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button
-                                size="sm"
-                                variant="subtle"
-                                icon="pencil"
-                                tooltip="{{ __('Edit breeding record') }}"
-                                aria-label="{{ __('Edit breeding record') }}"
-                                wire:click="openBreedingRecordModal({{ $breedingRecord->doe_id }}, {{ $breedingRecord->id }})"
-                            />
+                            <div class="flex items-center gap-1">
+                                <flux:button
+                                    size="sm"
+                                    variant="subtle"
+                                    icon="pencil"
+                                    tooltip="{{ __('Edit breeding record') }}"
+                                    aria-label="{{ __('Edit breeding record') }}"
+                                    wire:click="openBreedingRecordModal({{ $breedingRecord->doe_id }}, {{ $breedingRecord->id }})"
+                                />
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    icon="trash"
+                                    tooltip="{{ __('Delete breeding record') }}"
+                                    aria-label="{{ __('Delete breeding record') }}"
+                                    wire:click="deleteBreedingRecord({{ $breedingRecord->id }})"
+                                    wire:confirm="{{ __('Are you sure?') }}"
+                                />
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

@@ -63,15 +63,26 @@
                             <x-animal-status-badge :status="$animal->status" />
                         </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button
-                                size="sm"
-                                variant="subtle"
-                                icon="pencil"
-                                tooltip="{{ __('Edit animal') }}"
-                                aria-label="{{ __('Edit animal') }}"
-                                href="{{ route('animals.edit', $animal) }}"
-                                wire:navigate
-                            />
+                            <div class="flex items-center gap-1">
+                                <flux:button
+                                    size="sm"
+                                    variant="subtle"
+                                    icon="pencil"
+                                    tooltip="{{ __('Edit animal') }}"
+                                    aria-label="{{ __('Edit animal') }}"
+                                    href="{{ route('animals.edit', $animal) }}"
+                                    wire:navigate
+                                />
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    icon="trash"
+                                    tooltip="{{ __('Delete animal') }}"
+                                    aria-label="{{ __('Delete animal') }}"
+                                    wire:click="delete({{ $animal->id }})"
+                                    wire:confirm="{{ __('Are you sure?') }}"
+                                />
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

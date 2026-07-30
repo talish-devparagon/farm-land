@@ -70,14 +70,25 @@
                         <flux:table.cell>{{ __(':weight kg', ['weight' => $log->weight]) }}</flux:table.cell>
                         <flux:table.cell>{{ $log->recorded_at->toFormattedDateString() }}</flux:table.cell>
                         <flux:table.cell>
-                            <flux:button
-                                size="sm"
-                                variant="subtle"
-                                icon="pencil"
-                                tooltip="{{ __('Edit weight log') }}"
-                                aria-label="{{ __('Edit weight log') }}"
-                                wire:click="openWeightLogModal({{ $log->animal_id }}, {{ $log->id }})"
-                            />
+                            <div class="flex items-center gap-1">
+                                <flux:button
+                                    size="sm"
+                                    variant="subtle"
+                                    icon="pencil"
+                                    tooltip="{{ __('Edit weight log') }}"
+                                    aria-label="{{ __('Edit weight log') }}"
+                                    wire:click="openWeightLogModal({{ $log->animal_id }}, {{ $log->id }})"
+                                />
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    icon="trash"
+                                    tooltip="{{ __('Delete weight log') }}"
+                                    aria-label="{{ __('Delete weight log') }}"
+                                    wire:click="deleteWeightLog({{ $log->id }})"
+                                    wire:confirm="{{ __('Are you sure?') }}"
+                                />
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @endforeach

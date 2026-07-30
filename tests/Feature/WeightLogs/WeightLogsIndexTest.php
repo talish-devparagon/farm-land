@@ -4,6 +4,7 @@ use App\Livewire\WeightLogs\WeightLogsIndex;
 use App\Models\Animal;
 use App\Models\Farm;
 use App\Models\WeightLog;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 test('weight logs index page is displayed', function () {
@@ -110,4 +111,28 @@ test('opening the weight log modal for a new log dispatches the open event with 
     Livewire::test(WeightLogsIndex::class)
         ->call('openWeightLogModal', $animal->id)
         ->assertDispatched('open-weight-log-modal', animalId: $animal->id, weightLogId: null);
+});
+
+test('can delete a weight log from the index and it recalculates the animal current weight', function () {
+    $user = $this->actingAsFarmOwner();
+    $animal = Animal::factory()->for($user->farm)->create();
+    WeightLog::factory()->for($animal)->create(['weight' => 100, 'recorded_at' => now()->subDays(2)]);
+    $latest = WeightLog::factory()->for($animal)->create(['weight' => 200, 'recorded_at' => now()]);
+
+    Livewire::test(WeightLogsIndex::class)
+        ->call('deleteWeightLog', $latest->id);
+
+    expect(WeightLog::find($latest->id))->toBeNull()
+        ->and($animal->fresh()->current_weight)->toEqual('100.00');
+});
+
+test('cannot delete a weight log belonging to another farm', function () {
+    $this->actingAsFarmOwner();
+
+    $otherFarm = Farm::factory()->create();
+    $otherAnimal = Animal::factory()->for($otherFarm)->create();
+    $otherWeightLog = WeightLog::factory()->for($otherAnimal)->create();
+
+    expect(fn () => Livewire::test(WeightLogsIndex::class)->call('deleteWeightLog', $otherWeightLog->id))
+        ->toThrow(ModelNotFoundException::class);
 });
