@@ -13,7 +13,6 @@ use App\Livewire\WeightLogs\WeightLogsIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-Route::view('/x', 'welcome-2')->name('home-x');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
