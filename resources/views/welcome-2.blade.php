@@ -139,9 +139,9 @@
 
                     <div class="mt-10">
                         @auth
-                            <flux:button href="{{ route('dashboard') }}" variant="primary" size="lg" class="px-8">Go to dashboard</flux:button>
+                            <flux:button href="{{ route('dashboard') }}" variant="primary" class="px-8">Go to dashboard</flux:button>
                         @else
-                            <flux:button href="{{ route('register') }}" variant="primary" size="lg" class="px-8">Start using FarmLand</flux:button>
+                            <flux:button href="{{ route('register') }}" variant="primary" class="px-8">Start using FarmLand</flux:button>
                         @endauth
                     </div>
 
