@@ -18,27 +18,14 @@ test('herd growth counts new animals per month for the last 6 months', function 
         ->and(array_values($growth)[3])->toBe(1);
 });
 
-test('herd growth bars are shaped with position and size ready for the view', function () {
+test('months property controls how many months of growth data are returned', function () {
     $user = $this->actingAsFarmOwner();
 
-    Animal::factory()->for($user->farm)->count(3)->create(['created_at' => now()]);
+    Animal::factory()->for($user->farm)->count(2)->create(['created_at' => now()]);
 
-    $bars = Livewire::test(HerdGrowthChart::class)->instance()->bars();
+    $growth = Livewire::test(HerdGrowthChart::class, ['months' => 3])->instance()->herdGrowth();
 
-    expect($bars)->toHaveCount(6);
-
-    foreach ($bars as $bar) {
-        expect($bar)->toHaveKeys(['label', 'value', 'x', 'y', 'width', 'height']);
-    }
-
-    $lastBar = $bars->last();
-    expect($lastBar['value'])->toBe(3)
-        ->and($lastBar['height'])->toBe(82.0)
-        ->and($lastBar['y'])->toBe(16.0);
-
-    $emptyBar = $bars->first();
-    expect($emptyBar['value'])->toBe(0)
-        ->and($emptyBar['height'])->toBe(0.0);
+    expect($growth)->toHaveCount(3);
 });
 
 test('herd growth excludes soft-deleted animals', function () {

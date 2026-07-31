@@ -44,7 +44,7 @@ test('segments cap at the top 4 breeds and bucket the rest into other', function
     expect($segments->firstWhere('label', 'Other'))->toMatchArray(['count' => 1, 'color' => 'zinc']);
 
     foreach ($segments as $segment) {
-        expect($segment)->toHaveKeys(['label', 'count', 'percent', 'dashoffset', 'color', 'strokeClass', 'swatchClass']);
+        expect($segment)->toHaveKeys(['label', 'count', 'percent', 'color']);
     }
 
     expect((int) round($segments->sum('percent')))->toBe(100);

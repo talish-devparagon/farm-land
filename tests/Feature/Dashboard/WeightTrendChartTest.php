@@ -29,51 +29,10 @@ test('weight trend falls back to the herd average current weight when no logs ar
     expect(array_values($trend))->toBe(array_fill(0, 6, 150.0));
 });
 
-test('has data is false when there are no weight logs or animals with a current weight', function () {
+test('months property controls how many months of trend data are returned', function () {
     $this->actingAsFarmOwner();
 
-    $component = Livewire::test(WeightTrendChart::class)->instance();
+    $trend = Livewire::test(WeightTrendChart::class, ['months' => 3])->instance()->weightTrend();
 
-    expect($component->hasData())->toBeFalse();
-    expect($component->points())->toBeEmpty();
-    expect($component->linePaths())->toBe([]);
-    expect($component->areaPaths())->toBe([]);
-});
-
-test('weight trend points and paths split into separate segments across a gap in the data', function () {
-    $user = $this->actingAsFarmOwner();
-    $animal = Animal::factory()->for($user->farm)->create();
-
-    WeightLog::factory()->for($animal)->create(['weight' => 100, 'recorded_at' => now()->startOfMonth()->subMonths(5)]);
-    WeightLog::factory()->for($animal)->create(['weight' => 300, 'recorded_at' => now()]);
-
-    $component = Livewire::test(WeightTrendChart::class)->instance();
-
-    expect($component->hasData())->toBeTrue();
-
-    $points = $component->points();
-    expect($points)->toHaveCount(6);
-
-    foreach ($points as $point) {
-        expect($point)->toHaveKeys(['label', 'value', 'x', 'y']);
-    }
-
-    // Months 2-5 (index 1 through 4) have no recorded weight, so their y is null.
-    for ($index = 1; $index <= 4; $index++) {
-        expect($points->values()[$index]['y'])->toBeNull();
-    }
-
-    $linePaths = $component->linePaths();
-    $areaPaths = $component->areaPaths();
-
-    expect($linePaths)->toHaveCount(2);
-    expect($areaPaths)->toHaveCount(2);
-
-    foreach ($linePaths as $path) {
-        expect($path)->toStartWith('M');
-    }
-
-    foreach ($areaPaths as $path) {
-        expect($path)->toStartWith('M')->toEndWith('Z');
-    }
+    expect($trend)->toHaveCount(3);
 });

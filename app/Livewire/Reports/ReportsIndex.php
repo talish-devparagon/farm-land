@@ -6,8 +6,7 @@ use App\Actions\Reports\GetBreedingSummaryAction;
 use App\Actions\Reports\GetGrowthSummaryAction;
 use App\Actions\Reports\GetHealthSummaryAction;
 use App\Actions\Reports\GetHerdCompositionAction;
-use App\Concerns\ComputesBarChartGeometry;
-use App\Concerns\ComputesLineChartGeometry;
+use App\Concerns\ComputesDonutSegments;
 use App\Models\Animal;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -19,7 +18,7 @@ use Livewire\Component;
 #[Title('Reports')]
 class ReportsIndex extends Component
 {
-    use ComputesBarChartGeometry, ComputesLineChartGeometry;
+    use ComputesDonutSegments;
 
     /**
      * Number of months (including the current month) the report cuts cover.
@@ -121,86 +120,16 @@ class ReportsIndex extends Component
     }
 
     /**
-     * Bar geometry for the health records monthly trend chart.
+     * Breed breakdown of the whole herd (all statuses, unlike the dashboard's
+     * alive-only donut) bucketed into the top 4 breeds plus "Other" for the
+     * Herd Composition donut chart.
      *
-     * @return Collection<int, array{label: string, value: int, x: float, y: float, width: float, height: float}>
+     * @return Collection<int, array{label: string, count: int, percent: float, color: string}>
      */
     #[Computed]
-    public function healthTrendBars(): Collection
+    public function herdBreedSegments(): Collection
     {
-        return $this->barChartBars($this->healthSummary()['monthlyTrend']);
-    }
-
-    /**
-     * Bar geometry for the breeding matings monthly trend chart.
-     *
-     * @return Collection<int, array{label: string, value: int, x: float, y: float, width: float, height: float}>
-     */
-    #[Computed]
-    public function breedingTrendBars(): Collection
-    {
-        return $this->barChartBars($this->breedingSummary()['monthlyTrend']);
-    }
-
-    /**
-     * Whether at least one month has a recorded (non-null) average weight.
-     */
-    #[Computed]
-    public function growthTrendHasData(): bool
-    {
-        return $this->lineChartHasData($this->growthSummary()['monthlyAverageWeight']);
-    }
-
-    /**
-     * Chart-space points for the growth trend. See {@see ComputesLineChartGeometry}.
-     *
-     * @return Collection<int, array{label: string, value: float|null, x: float, y: float|null}>
-     */
-    #[Computed]
-    public function growthTrendPoints(): Collection
-    {
-        return $this->lineChartPoints($this->growthSummary()['monthlyAverageWeight']);
-    }
-
-    /**
-     * SVG `d` path attribute(s) for the growth trend line.
-     *
-     * @return array<int, string>
-     */
-    #[Computed]
-    public function growthTrendLinePaths(): array
-    {
-        return $this->lineChartLinePaths($this->growthSummary()['monthlyAverageWeight']);
-    }
-
-    /**
-     * SVG `d` path attribute(s) for the growth trend area fill.
-     *
-     * @return array<int, string>
-     */
-    #[Computed]
-    public function growthTrendAreaPaths(): array
-    {
-        return $this->lineChartAreaPaths($this->growthSummary()['monthlyAverageWeight']);
-    }
-
-    /**
-     * Breed breakdown as already-shaped bars: each entry's share of the
-     * largest breed count, for rendering a simple horizontal bar list.
-     *
-     * @return Collection<int, array{label: string, count: int, percent: float}>
-     */
-    #[Computed]
-    public function herdBreedBars(): Collection
-    {
-        $byBreed = $this->herdComposition()['byBreed'];
-        $max = max([1, ...array_values($byBreed)]);
-
-        return collect($byBreed)->map(fn (int $count, string $breed): array => [
-            'label' => $breed,
-            'count' => $count,
-            'percent' => round($count / $max * 100, 1),
-        ])->values();
+        return $this->donutSegments($this->herdComposition()['byBreed']);
     }
 
     /**

@@ -130,17 +130,6 @@ test('a user who is not a farm owner cannot view reports', function () {
     $this->get(route('reports.index'))->assertForbidden();
 });
 
-test('herd breed bars scale each breed against the largest breed count', function () {
-    $user = $this->actingAsFarmOwner();
-    Animal::factory()->for($user->farm)->count(4)->create(['breed' => 'Holstein']);
-    Animal::factory()->for($user->farm)->count(2)->create(['breed' => 'Jersey']);
-
-    $bars = Livewire::test(ReportsIndex::class)->instance()->herdBreedBars();
-
-    expect($bars->firstWhere('label', 'Holstein'))->toBe(['label' => 'Holstein', 'count' => 4, 'percent' => 100.0])
-        ->and($bars->firstWhere('label', 'Jersey'))->toBe(['label' => 'Jersey', 'count' => 2, 'percent' => 50.0]);
-});
-
 test('herd sex split reports counts and percentages for each sex', function () {
     $user = $this->actingAsFarmOwner();
     Animal::factory()->for($user->farm)->count(3)->create(['sex' => AnimalSex::Male]);
@@ -160,24 +149,15 @@ test('herd age bars exclude brackets with no animals', function () {
     expect($bars->pluck('label')->all())->toBe(['0-6 months']);
 });
 
-test('health and breeding trend bars are keyed by month label with scaled bar heights', function () {
+test('herd breed segments bucket breeds into top 4 plus other', function () {
     $user = $this->actingAsFarmOwner();
-    $animal = Animal::factory()->for($user->farm)->create();
-    HealthRecord::factory()->for($animal)->for($user->farm)->count(3)->create(['date' => now()]);
+    Animal::factory()->for($user->farm)->count(3)->create(['breed' => 'Holstein']);
+    Animal::factory()->for($user->farm)->count(2)->create(['breed' => 'Jersey']);
 
-    $component = Livewire::test(ReportsIndex::class)->instance();
-    $bars = $component->healthTrendBars();
-    $currentMonthBar = $bars->firstWhere('label', now()->format('M'));
+    $segments = Livewire::test(ReportsIndex::class)->instance()->herdBreedSegments();
 
-    expect($currentMonthBar['value'])->toBe(3)
-        ->and($currentMonthBar['height'])->toBe(80.0);
-});
-
-test('growth trend has no data when there are no weight logs in range', function () {
-    $this->actingAsFarmOwner();
-
-    $component = Livewire::test(ReportsIndex::class)->instance();
-
-    expect($component->growthTrendHasData())->toBeFalse();
-    expect($component->growthTrendPoints())->toBeEmpty();
+    expect($segments->pluck('label')->all())->toContain('Holstein', 'Jersey');
+    foreach ($segments as $segment) {
+        expect($segment)->toHaveKeys(['label', 'count', 'percent', 'color']);
+    }
 });

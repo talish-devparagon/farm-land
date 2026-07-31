@@ -34,20 +34,18 @@
                     <flux:heading size="xl" class="font-mono tabular-nums">{{ number_format($this->herdComposition['total']) }}</flux:heading>
                 </div>
 
-                {{-- Breed breakdown --}}
-                <ul class="space-y-2.5">
-                    @foreach ($this->herdBreedBars as $bar)
-                        <li wire:key="comp-breed-{{ $bar['label'] }}">
-                            <div class="flex items-center justify-between gap-2 text-sm">
-                                <span class="truncate text-zinc-700 dark:text-zinc-300">{{ $bar['label'] }}</span>
-                                <span class="shrink-0 font-mono text-zinc-500 tabular-nums dark:text-zinc-400">{{ $bar['count'] }}</span>
-                            </div>
-                            <div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-white/10">
-                                <div class="h-full rounded-full bg-indigo-500 dark:bg-indigo-400" style="width: {{ $bar['percent'] }}%"></div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
+                {{-- Breed distribution --}}
+                <div>
+                    <flux:text size="sm" class="mb-3 font-medium text-zinc-700 dark:text-zinc-300">{{ __('By breed') }}</flux:text>
+                    <livewire:charts.donut-chart
+                        :segments="$this->herdBreedSegments->all()"
+                        :total="$this->herdComposition['total']"
+                        total-label="{{ __('animals') }}"
+                        :empty-message="__('No animals recorded yet.')"
+                    />
+                </div>
+
+                <flux:separator />
 
                 <flux:separator />
 
@@ -137,27 +135,8 @@
 
             <div>
                 <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Monthly trend') }}</flux:text>
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="mt-2 h-20 w-full overflow-visible" role="img" aria-label="{{ __('Bar chart of health records per month') }}">
-                    <line x1="0" y1="98" x2="100" y2="98" class="stroke-zinc-200 dark:stroke-white/10" stroke-width="0.5" />
-                    @foreach ($this->healthTrendBars as $bar)
-                        <rect
-                            wire:key="health-trend-{{ $loop->index }}"
-                            x="{{ $bar['x'] }}"
-                            y="{{ $bar['y'] }}"
-                            width="{{ $bar['width'] }}"
-                            height="{{ $bar['height'] }}"
-                            rx="1"
-                            class="fill-emerald-500 dark:fill-emerald-400"
-                        >
-                            <title>{{ $bar['label'] }}: {{ $bar['value'] }}</title>
-                        </rect>
-                    @endforeach
-                </svg>
-                <div class="mt-1 flex flex-wrap justify-between gap-x-2 text-[10px] text-zinc-500 dark:text-zinc-400">
-                    @foreach ($this->healthTrendBars as $bar)
-                        <span wire:key="health-trend-label-{{ $loop->index }}">{{ $bar['label'] }}</span>
-                    @endforeach
-                </div>
+                {{-- Chart.js rendering wired up by the frontend pass; see App\Livewire\Charts\BarChart. --}}
+                <livewire:charts.bar-chart :series="$this->healthSummary['monthlyTrend']" color="emerald" height="h-20" />
             </div>
         </flux:card>
 
@@ -194,27 +173,8 @@
 
             <div>
                 <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('Monthly trend') }}</flux:text>
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="mt-2 h-20 w-full overflow-visible" role="img" aria-label="{{ __('Bar chart of matings per month') }}">
-                    <line x1="0" y1="98" x2="100" y2="98" class="stroke-zinc-200 dark:stroke-white/10" stroke-width="0.5" />
-                    @foreach ($this->breedingTrendBars as $bar)
-                        <rect
-                            wire:key="breeding-trend-{{ $loop->index }}"
-                            x="{{ $bar['x'] }}"
-                            y="{{ $bar['y'] }}"
-                            width="{{ $bar['width'] }}"
-                            height="{{ $bar['height'] }}"
-                            rx="1"
-                            class="fill-pink-500 dark:fill-pink-400"
-                        >
-                            <title>{{ $bar['label'] }}: {{ $bar['value'] }}</title>
-                        </rect>
-                    @endforeach
-                </svg>
-                <div class="mt-1 flex flex-wrap justify-between gap-x-2 text-[10px] text-zinc-500 dark:text-zinc-400">
-                    @foreach ($this->breedingTrendBars as $bar)
-                        <span wire:key="breeding-trend-label-{{ $loop->index }}">{{ $bar['label'] }}</span>
-                    @endforeach
-                </div>
+                {{-- Chart.js rendering wired up by the frontend pass; see App\Livewire\Charts\BarChart. --}}
+                <livewire:charts.bar-chart :series="$this->breedingSummary['monthlyTrend']" color="pink" height="h-20" />
             </div>
         </flux:card>
 
@@ -241,40 +201,8 @@
                 </div>
             </div>
 
-            @if ($this->growthTrendHasData)
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-36 w-full overflow-visible" role="img" aria-label="{{ __('Line chart of average weight per month') }}">
-                    <defs>
-                        <linearGradient id="reportsGrowthAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" class="[stop-color:var(--color-violet-400)] [stop-opacity:0.35]" />
-                            <stop offset="100%" class="[stop-color:var(--color-violet-400)] [stop-opacity:0]" />
-                        </linearGradient>
-                    </defs>
-                    <line x1="0" y1="98" x2="100" y2="98" class="stroke-zinc-200 dark:stroke-white/10" stroke-width="0.5" />
-                    @foreach ($this->growthTrendAreaPaths as $areaPath)
-                        <path wire:key="growth-area-{{ $loop->index }}" d="{{ $areaPath }}" fill="url(#reportsGrowthAreaGradient)" stroke="none" />
-                    @endforeach
-                    @foreach ($this->growthTrendLinePaths as $linePath)
-                        <path wire:key="growth-line-{{ $loop->index }}" d="{{ $linePath }}" fill="none" class="stroke-violet-500 dark:stroke-violet-400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    @endforeach
-                    @foreach ($this->growthTrendPoints as $point)
-                        @if ($point['y'] !== null)
-                            <circle wire:key="growth-point-{{ $loop->index }}" cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="1.5" class="fill-violet-500 dark:fill-violet-400">
-                                <title>{{ $point['label'] }}: {{ __(':weight kg', ['weight' => $point['value']]) }}</title>
-                            </circle>
-                        @endif
-                    @endforeach
-                </svg>
-                <div class="flex flex-wrap justify-between gap-x-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    @foreach ($this->growthTrendPoints as $point)
-                        <span wire:key="growth-label-{{ $loop->index }}">{{ $point['label'] }}</span>
-                    @endforeach
-                </div>
-            @else
-                <div class="flex h-36 flex-col items-center justify-center gap-2">
-                    <flux:icon.scale variant="outline" class="size-8 text-zinc-300 dark:text-zinc-600" />
-                    <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">{{ __('No weight data recorded in this window.') }}</flux:text>
-                </div>
-            @endif
+            {{-- Reuses the dashboard's weight trend chart, parameterized by the selected range. --}}
+            <livewire:dashboard.weight-trend-chart :months="$rangeMonths" />
         </flux:card>
     </div>
 </div>
