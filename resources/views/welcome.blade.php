@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark scroll-smooth">
     <head>
         @include('partials.head')
     </head>
@@ -42,7 +42,7 @@
                 </h1>
 
                 <p class="mx-auto mt-6 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
-                    Track every animal, breeding cycle, health record, and weight gain in one place — so you spend less time on paperwork and more time on the farm.
+                    Track every animal, breeding cycle, health record, and weight gain in one place, so you spend less time on paperwork and more time on the farm.
                 </p>
 
                 <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -60,17 +60,17 @@
         <section id="features" class="mx-auto max-w-7xl px-6 py-20">
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Everything your herd records need</h2>
-                <p class="mt-4 text-zinc-600 dark:text-zinc-400">No spreadsheets, no lost notebooks — just a clear picture of every animal on your farm.</p>
+                <p class="mt-4 text-zinc-600 dark:text-zinc-400">No spreadsheets, no lost notebooks, just a clear picture of every animal on your farm.</p>
             </div>
 
             <div class="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @php
                     $features = [
-                        ['icon' => 'identification', 'title' => 'Animal Records', 'body' => 'Keep a full profile for every animal — breed, status, lineage, and history at a glance.'],
+                        ['icon' => 'identification', 'title' => 'Animal Records', 'body' => 'Keep a full profile for every animal, breed, status, lineage, and history at a glance.'],
                         ['icon' => 'heart', 'title' => 'Health Tracking', 'body' => 'Log vaccinations, treatments, and vet visits so nothing falls through the cracks.'],
                         ['icon' => 'sparkles', 'title' => 'Breeding Records', 'body' => 'Track breeding cycles and get reminders for upcoming calving dates.'],
                         ['icon' => 'scale', 'title' => 'Weight Logs', 'body' => 'Monitor growth trends over time to catch problems early and plan feed better.'],
-                        ['icon' => 'bell-alert', 'title' => 'Upcoming Reminders', 'body' => 'Never miss a due date — health and breeding reminders land right on your dashboard.'],
+                        ['icon' => 'bell-alert', 'title' => 'Upcoming Reminders', 'body' => 'Never miss a due date, health and breeding reminders land right on your dashboard.'],
                         ['icon' => 'chart-bar', 'title' => 'Reports & Insights', 'body' => 'See herd growth, breed distribution, and trends with simple, clear reports.'],
                     ];
                 @endphp
@@ -78,7 +78,7 @@
                 @foreach ($features as $feature)
                     <div class="rounded-xl border border-zinc-200 p-6 transition hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:hover:border-zinc-700">
                         <div class="flex size-10 items-center justify-center rounded-lg bg-accent-content text-accent-foreground">
-                            <flux:icon :name="$feature['icon']" variant="outline" class="size-5" />
+                            <flux:icon :name="$feature['icon']" variant="outline" class="size-5 text-white dark:text-accent-foreground" />
                         </div>
                         <h3 class="mt-4 font-semibold">{{ $feature['title'] }}</h3>
                         <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{{ $feature['body'] }}</p>
@@ -117,7 +117,7 @@
             </div>
 
             <div class="mt-8 flex items-center justify-center gap-3">
-                <span class="text-sm font-medium" :class="!yearly && 'text-zinc-900 dark:text-white'">Monthly</span>
+                <span class="text-sm font-medium opacity-50 ease-in-out duration-300" :class="!yearly && 'text-zinc-900 dark:text-white opacity-100'">Monthly</span>
                 <button
                     type="button"
                     role="switch"
@@ -128,7 +128,7 @@
                 >
                     <span class="inline-block size-4 transform rounded-full bg-white transition" :class="yearly ? 'translate-x-6' : 'translate-x-1'"></span>
                 </button>
-                <span class="text-sm font-medium" :class="yearly && 'text-zinc-900 dark:text-white'">
+                <span class="text-sm font-medium opacity-50 ease-in-out duration-300" :class="yearly && 'text-zinc-900 dark:text-white opacity-100'">
                     Yearly <span class="text-accent">(save 20%)</span>
                 </span>
             </div>
@@ -187,7 +187,7 @@
                 <p class="mt-6 text-zinc-600 dark:text-zinc-400">
                     We grew up around farms where herd records lived in notebooks, spreadsheets, and memory.
                     {{ config('app.name', 'This app') }} exists to give farm owners a simple, reliable way to track
-                    every animal's story — so good decisions are backed by good records, not guesswork.
+                    every animal's story, so good decisions are backed by good records, not guesswork.
                 </p>
             </div>
         </section>
